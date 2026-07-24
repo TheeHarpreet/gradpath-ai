@@ -1,0 +1,38 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Candidate data: use committed synthetic fixtures only
+data/private/
+uploads/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# JavaScript
+node_modules/
+.next/
+dist/
+coverage/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated and local runtime files
+*.log
+*.sqlite
+*.sqlite3
+tmp/
+
