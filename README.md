@@ -204,8 +204,35 @@ erDiagram
 
 - [Product brief](docs/product-brief.md)
 - [Product diagrams](docs/diagrams.md)
+- [Technical architecture](docs/architecture.md)
+- [Architecture decisions](docs/decisions/README.md)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
+
+## Proposed technical architecture
+
+GradPath AI uses a React/TypeScript web application and a FastAPI modular
+monolith. The backend contains explicit ingestion, retrieval, verification,
+alignment, export, and MCP adapter boundaries. PostgreSQL with pgvector stores
+relational data and evidence vectors, while original uploads and exports remain
+in private object storage.
+
+```mermaid
+flowchart LR
+    Browser["Candidate browser"] --> Web["React + TypeScript + Vite"]
+    Web -->|"REST + SSE"| API["FastAPI modular monolith"]
+    API --> Agent["LangGraph controlled workflow"]
+    Agent --> RAG["Hybrid RAG + claim verification"]
+    RAG --> DB[("PostgreSQL + pgvector")]
+    API --> Objects[("Private object storage")]
+    API --> Models["Model provider adapters"]
+    MCPClient["MCP-compatible client"] --> MCP["Narrow MCP adapter"]
+    MCP --> API
+```
+
+The complete architecture document includes system context, container,
+component, agent-state, RAG-sequence, security-boundary, deployment, and
+physical ERD diagrams. All technology choices are explained through ADRs.
 
 ## Planned technical direction
 
@@ -219,3 +246,58 @@ them against the requirements.
 Development and automated tests must use fictional, synthetic, or properly
 redacted candidate data. Real CVs, personal contact details, and API keys must
 never be committed.
+
+## Repository structure
+
+```text
+gradpath-ai/
+├── apps/
+│   ├── api/                 # FastAPI modular monolith
+│   ├── web/                 # React + TypeScript + Vite
+│   └── mcp-server/          # permission-controlled MCP adapter
+├── docs/
+│   ├── decisions/           # architecture decision records
+│   └── architecture.md      # technical design and diagrams
+├── .github/workflows/       # continuous integration
+├── compose.yaml             # local PostgreSQL + pgvector
+├── pyproject.toml           # Python workspace and quality configuration
+└── uv.lock                  # reproducible Python dependency lock
+```
+
+## Development setup
+
+Prerequisites:
+
+- Python 3.13
+- Node.js 20.19 or a newer compatible release
+- npm
+- uv
+- Docker with Compose when database work begins
+
+Install locked dependencies:
+
+```powershell
+python -m uv sync --locked --all-packages --dev
+npm ci --prefix apps/web
+Copy-Item .env.example .env
+```
+
+Run the current API and web foundations in separate terminals:
+
+```powershell
+python -m uv run gradpath-api
+npm --prefix apps/web run dev
+```
+
+Run all current checks:
+
+```powershell
+python -m uv run ruff format --check .
+python -m uv run ruff check .
+python -m uv run mypy
+python -m uv run pytest
+npm --prefix apps/web run check
+```
+
+The current scaffold intentionally does not perform CV analysis. Product
+features begin with the evaluated vertical slice in Step 3.

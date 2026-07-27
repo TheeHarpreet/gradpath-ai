@@ -23,6 +23,9 @@ node_modules/
 .next/
 dist/
 coverage/
+.vite/
+playwright-report/
+test-results/
 
 # Editors and operating systems
 .vscode/
@@ -35,4 +38,9 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 tmp/
+
+# Local development and tooling
+.python-version
+.coverage
+htmlcov/
 

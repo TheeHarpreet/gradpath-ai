@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    environment:
+      POSTGRES_DB: gradpath
+      POSTGRES_USER: gradpath
+      POSTGRES_PASSWORD: gradpath_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - gradpath_postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gradpath -d gradpath"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  gradpath_postgres:
