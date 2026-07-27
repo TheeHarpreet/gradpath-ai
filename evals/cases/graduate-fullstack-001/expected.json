@@ -1,0 +1,147 @@
+{
+  "case_id": "graduate-fullstack-001",
+  "case_version": 1,
+  "requirements": [
+    {
+      "id": "req-001",
+      "priority": "essential",
+      "source_text": "Practical JavaScript or TypeScript development experience.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-project-taskflow", "cv-experience", "cv-skills"]
+    },
+    {
+      "id": "req-002",
+      "priority": "essential",
+      "source_text": "Experience building user interfaces with React or a comparable framework.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-project-taskflow", "cv-experience"]
+    },
+    {
+      "id": "req-003",
+      "priority": "essential",
+      "source_text": "Ability to build or consume REST APIs using Python, Java, or TypeScript.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-project-taskflow"]
+    },
+    {
+      "id": "req-004",
+      "priority": "essential",
+      "source_text": "Understanding of relational databases and SQL.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-project-taskflow", "cv-skills"]
+    },
+    {
+      "id": "req-005",
+      "priority": "essential",
+      "source_text": "Experience using Git and participating in code review.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-experience", "cv-skills"]
+    },
+    {
+      "id": "req-006",
+      "priority": "essential",
+      "source_text": "Evidence of automated testing.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-experience", "cv-project-taskflow"]
+    },
+    {
+      "id": "req-007",
+      "priority": "essential",
+      "source_text": "Clear written and verbal communication in a collaborative team.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-experience", "cv-project-datapulse", "evidence-intern-feedback"]
+    },
+    {
+      "id": "req-008",
+      "priority": "desirable",
+      "source_text": "Experience using Docker for local development or deployment.",
+      "expected_status": "supported",
+      "evidence_ids": ["evidence-taskflow-readme"]
+    },
+    {
+      "id": "req-009",
+      "priority": "desirable",
+      "source_text": "Familiarity with CI/CD workflows.",
+      "expected_status": "supported",
+      "evidence_ids": ["cv-project-taskflow"]
+    },
+    {
+      "id": "req-010",
+      "priority": "desirable",
+      "source_text": "Exposure to AWS cloud services.",
+      "expected_status": "unsupported",
+      "evidence_ids": ["evidence-cloud-clarification"]
+    },
+    {
+      "id": "req-011",
+      "priority": "desirable",
+      "source_text": "Familiarity with Kubernetes.",
+      "expected_status": "unsupported",
+      "evidence_ids": []
+    }
+  ],
+  "required_strengths": [
+    "React and TypeScript project delivery",
+    "FastAPI REST API development",
+    "PostgreSQL and SQL",
+    "automated testing",
+    "GitHub pull-request collaboration",
+    "Docker local-development evidence",
+    "GitHub Actions CI"
+  ],
+  "required_gaps": ["AWS cloud services", "Kubernetes"],
+  "prohibited_candidate_claims": [
+    "AWS project or deployment experience",
+    "AWS certification",
+    "Kubernetes experience",
+    "Docker frontend deployment",
+    "technical leadership at BrightByte Labs",
+    "more than three months of commercial software-engineering experience",
+    "any invented performance percentage, user count, revenue value, or time saving"
+  ],
+  "expected_changes": [
+    {
+      "target": "profile",
+      "decision": "rewrite",
+      "reason": "Lead with evidence relevant to the full-stack role.",
+      "required_evidence_ids": ["cv-project-taskflow", "cv-experience"]
+    },
+    {
+      "target": "TaskFlow project",
+      "decision": "expand",
+      "reason": "Make the API, database, tests, CI, and supported Docker evidence explicit.",
+      "required_evidence_ids": ["cv-project-taskflow", "evidence-taskflow-readme"]
+    },
+    {
+      "target": "AWS",
+      "decision": "exclude",
+      "reason": "Reading an introductory article is not practical cloud experience.",
+      "required_evidence_ids": ["evidence-cloud-clarification"]
+    },
+    {
+      "target": "Kubernetes",
+      "decision": "exclude",
+      "reason": "No candidate evidence supports this requirement.",
+      "required_evidence_ids": []
+    }
+  ],
+  "aligned_cv_checks": {
+    "must_include": [
+      "React",
+      "TypeScript",
+      "FastAPI",
+      "PostgreSQL",
+      "Docker",
+      "GitHub Actions",
+      "BrightByte Labs"
+    ],
+    "must_not_include_as_candidate_claims": ["AWS", "Kubernetes", "AWS Certified"],
+    "must_preserve": [
+      "BSc Computer Science",
+      "Northbridge University",
+      "2023–2026",
+      "June 2025–August 2025",
+      "First-class honours"
+    ]
+  }
+}

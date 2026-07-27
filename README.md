@@ -5,8 +5,10 @@ early-career technology candidates.
 
 ## Status
 
-GradPath AI is currently in the product-definition stage. No working product
-features are claimed yet.
+GradPath AI is currently implementing its evaluated text-analysis vertical
+slice. The API, deterministic requirement extraction, lexical retrieval,
+provider boundary, citation verification, and fictional golden-case tests are
+working locally. The user-facing analysis interface is not built yet.
 
 The first usable milestone will accept a fictional or redacted CV and a job
 description, analyse the role's requirements against the candidate's evidence,
@@ -206,6 +208,8 @@ erDiagram
 - [Product diagrams](docs/diagrams.md)
 - [Technical architecture](docs/architecture.md)
 - [Architecture decisions](docs/decisions/README.md)
+- [Evaluation strategy](docs/evaluation.md)
+- [Step 3 vertical slice](docs/step-3-vertical-slice.md)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
 
@@ -234,12 +238,11 @@ The complete architecture document includes system context, container,
 component, agent-state, RAG-sequence, security-boundary, deployment, and
 physical ERD diagrams. All technology choices are explained through ADRs.
 
-## Planned technical direction
+## Technical stack
 
-The likely stack is React with TypeScript, Python, FastAPI, LangGraph,
+The selected stack is React with TypeScript, Python, FastAPI, LangGraph,
 PostgreSQL with pgvector, an MCP server, Docker, GitHub Actions, and Google
-Cloud Run. These choices are provisional until Step 2 compares and validates
-them against the requirements.
+Cloud Run. Architecture decisions and trade-offs are recorded in `docs/decisions`.
 
 ## Important data rule
 
@@ -258,6 +261,7 @@ gradpath-ai/
 ├── docs/
 │   ├── decisions/           # architecture decision records
 │   └── architecture.md      # technical design and diagrams
+├── evals/                    # fictional golden cases and expected behaviour
 ├── .github/workflows/       # continuous integration
 ├── compose.yaml             # local PostgreSQL + pgvector
 ├── pyproject.toml           # Python workspace and quality configuration
@@ -272,15 +276,19 @@ Prerequisites:
 - Node.js 20.19 or a newer compatible release
 - npm
 - uv
-- Docker with Compose when database work begins
+- Docker with Compose
 
 Install locked dependencies:
 
 ```powershell
 python -m uv sync --locked --all-packages --dev
 npm ci --prefix apps/web
-Copy-Item .env.example .env
+Copy-Item .env.example .env.local
 ```
+
+Add `OPENAI_API_KEY` only to the ignored `.env.local` file. API usage and
+ChatGPT/Codex subscriptions are billed separately. Automated tests use a
+deterministic provider and never require a key or network request.
 
 Run the current API and web foundations in separate terminals:
 
@@ -299,5 +307,8 @@ python -m uv run pytest
 npm --prefix apps/web run check
 ```
 
-The current scaffold intentionally does not perform CV analysis. Product
-features begin with the evaluated vertical slice in Step 3.
+The first endpoint is `POST /api/v1/analyses`. It accepts pasted CV, job
+description, and optional supporting-evidence text. Its response contains
+structured requirement assessments, exact candidate-evidence citations,
+strengths, gaps, change suggestions, unsupported-claim warnings, and a Markdown
+CV draft that is always marked as requiring review.

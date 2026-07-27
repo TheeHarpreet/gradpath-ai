@@ -7,6 +7,7 @@ dependencies = [
     "alembic>=1.18.5",
     "fastapi>=0.140.7",
     "langgraph>=1.2.9",
+    "openai>=2.24.0",
     "psycopg[binary]>=3.3.4",
     "pydantic-settings>=2.14.2",
     "sqlalchemy>=2.0.51",
