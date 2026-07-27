@@ -74,10 +74,11 @@ The real adapter uses the OpenAI Responses API and native Pydantic Structured
 Outputs. Its model, reasoning effort, and storage setting are configuration,
 not hard-coded business logic. Automated tests inject a deterministic provider.
 
-The first live request on 27 July 2026 reached OpenAI but returned HTTP 429 with
-`insufficient_quota`. This confirms key loading and network connectivity but
-does not count as a successful model validation. A live golden-case run remains
-pending until API credits or project quota are available.
+After API credits were enabled on 27 July 2026, the fictional golden case passed
+through the real `gpt-5.6-sol` adapter. It analysed all 11 requirements, returned
+9 supported and 2 unsupported assessments, proposed 5 changes, and produced 25
+citations that passed independent source-and-quote validation. Response storage
+was disabled. No real candidate data was used in this live verification.
 
 ## Deliberate limitations
 
