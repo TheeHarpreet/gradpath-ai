@@ -23,5 +23,4 @@ USER gradpath
 
 EXPOSE 8080
 
-CMD ["uv", "run", "--no-sync", "uvicorn", "gradpath_api.main:app", "--host", "0.0.0.0", "--port", "8080"]
-
+CMD ["/app/.venv/bin/uvicorn", "gradpath_api.main:app", "--host", "0.0.0.0", "--port", "8080"]
