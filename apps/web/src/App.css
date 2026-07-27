@@ -1,0 +1,253 @@
+:root {
+  color: #17201f;
+  background: #f3f1e9;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 80% 10%,
+      rgb(212 232 218 / 65%),
+      transparent 28rem
+    ),
+    #f3f1e9;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  background: #17201f;
+  border-radius: 0.5rem;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-header,
+main,
+footer {
+  width: min(1120px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid rgb(23 32 31 / 15%);
+}
+
+.brand {
+  display: inline-flex;
+  gap: 0.7rem;
+  align-items: center;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  color: #fff;
+  background: #1f5b4a;
+  border-radius: 0.65rem;
+  place-items: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.phase-badge {
+  padding: 0.4rem 0.7rem;
+  color: #214d40;
+  background: #dce9dd;
+  border: 1px solid #b6d0ba;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.hero {
+  max-width: 850px;
+  padding-block: clamp(4rem, 10vw, 8rem);
+}
+
+.eyebrow {
+  margin: 0 0 0.8rem;
+  color: #1f6d55;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 15ch;
+  margin-bottom: 1.5rem;
+  font-size: clamp(3rem, 8vw, 6.8rem);
+  font-weight: 760;
+  letter-spacing: -0.065em;
+  line-height: 0.92;
+}
+
+h2 {
+  max-width: 22ch;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.hero-copy {
+  max-width: 65ch;
+  margin-bottom: 2rem;
+  color: #42504d;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.65;
+}
+
+.notice {
+  width: fit-content;
+  padding: 1rem 1.1rem;
+  background: rgb(255 255 255 / 58%);
+  border: 1px solid rgb(23 32 31 / 18%);
+  border-left: 4px solid #c47c35;
+  border-radius: 0.4rem;
+  line-height: 1.5;
+}
+
+.workflow {
+  padding-block: 5rem;
+  border-top: 1px solid rgb(23 32 31 / 15%);
+}
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.workflow-card {
+  min-height: 15rem;
+  padding: 1.4rem;
+  background: #fffefa;
+  border: 1px solid rgb(23 32 31 / 15%);
+  border-radius: 0.9rem;
+}
+
+.step-number {
+  display: block;
+  margin-bottom: 3.5rem;
+  color: #1f6d55;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.workflow-card h3 {
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+}
+
+.workflow-card p,
+.principles li,
+footer {
+  color: #52605d;
+  line-height: 1.55;
+}
+
+.principles {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  padding-block: 6rem;
+  border-top: 1px solid rgb(23 32 31 / 15%);
+}
+
+.principles ul {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+footer {
+  padding-block: 2rem;
+  border-top: 1px solid rgb(23 32 31 / 15%);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 800px) {
+  .workflow-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .principles {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-header {
+    align-items: flex-start;
+  }
+
+  .phase-badge {
+    max-width: 9rem;
+    text-align: center;
+  }
+
+  .workflow-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
