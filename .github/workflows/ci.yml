@@ -35,7 +35,7 @@ jobs:
       GRADPATH_RUN_POSTGRES_TESTS: "1"
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -71,7 +71,7 @@ jobs:
         working-directory: apps/web
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
