@@ -8,8 +8,14 @@ from openai import AsyncOpenAI
 
 from gradpath_api.api.router import api_router
 from gradpath_api.application.analysis_service import AnalysisService
+from gradpath_api.application.reranking import EvidenceAwareReranker
+from gradpath_api.application.retrievers import HybridEvidenceRetriever
 from gradpath_api.core.config import Settings, get_settings
 from gradpath_api.infrastructure.ai.openai_provider import OpenAIAnalysisProvider
+from gradpath_api.infrastructure.embeddings.openai_provider import (
+    OpenAIEmbeddingProvider,
+)
+from gradpath_api.infrastructure.retrieval.postgres import PostgresRetrievalIndex
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -44,13 +50,28 @@ def _create_analysis_service(settings: Settings) -> AnalysisService | None:
 
     if settings.openai_api_key is None:
         return None
+    client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value())
     provider = OpenAIAnalysisProvider(
-        client=AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value()),
+        client=client,
         model=settings.openai_model,
         reasoning_effort=settings.openai_reasoning_effort,
         store=settings.openai_store_responses,
     )
-    return AnalysisService(provider)
+    embedding_provider = OpenAIEmbeddingProvider(
+        client=client,
+        model=settings.embedding_model,
+        dimensions=settings.embedding_dimensions,
+        batch_size=settings.embedding_batch_size,
+    )
+    retriever = HybridEvidenceRetriever(
+        embedding_provider=embedding_provider,
+        limit_per_requirement=settings.retrieval_limit,
+        candidate_limit=settings.retrieval_candidate_limit,
+        rrf_k=settings.retrieval_rrf_k,
+        index=PostgresRetrievalIndex(str(settings.database_url)),
+        reranker=EvidenceAwareReranker(),
+    )
+    return AnalysisService(provider, retriever=retriever)
 
 
 app = create_app()

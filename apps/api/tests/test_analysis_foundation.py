@@ -6,7 +6,7 @@ from gradpath_api.application.requirements import (
     extract_requirements,
 )
 from gradpath_api.application.retrieval import retrieve_evidence
-from gradpath_api.application.sources import build_source_catalog
+from gradpath_api.application.sources import SourceCatalogError, build_source_catalog
 from gradpath_api.application.validation import (
     AnalysisValidationError,
     validate_model_analysis,
@@ -77,6 +77,19 @@ def test_lexical_retrieval_returns_traceable_source_chunks() -> None:
     assert retrieved["req-001"][0].source_id == "cv-001"
     assert "TypeScript" in retrieved["req-001"][0].text
     assert retrieved["req-003"] == []
+
+
+def test_source_catalog_rejects_duplicate_candidate_anchors() -> None:
+    request = AnalysisRequest(
+        candidate_cv=(
+            "# Candidate\n\n## First {#duplicate}\n\nOne factual section.\n\n"
+            "## Second {#duplicate}\n\nAnother factual section."
+        ),
+        job_description=JOB_TEXT,
+    )
+
+    with pytest.raises(SourceCatalogError, match="duplicate source IDs"):
+        build_source_catalog(request)
 
 
 def test_validation_rejects_a_quote_not_found_in_its_source() -> None:

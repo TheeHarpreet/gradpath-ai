@@ -20,3 +20,7 @@ class RetrievedEvidence(ContractModel):
     source_id: str = Field(pattern=r"^[a-z0-9][a-z0-9-]*$")
     score: float = Field(gt=0)
     text: str = Field(min_length=1, max_length=10_000)
+    lexical_rank: int | None = Field(default=None, ge=1)
+    semantic_rank: int | None = Field(default=None, ge=1)
+    semantic_score: float | None = Field(default=None, ge=-1, le=1)
+    rerank_score: float | None = Field(default=None, gt=0)

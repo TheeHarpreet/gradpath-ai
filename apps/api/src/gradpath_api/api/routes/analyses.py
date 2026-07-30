@@ -6,6 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from gradpath_api.application.analysis_service import AnalysisService
 from gradpath_api.application.requirements import RequirementExtractionError
+from gradpath_api.application.retrievers import EvidenceRetrievalError
+from gradpath_api.application.sources import SourceCatalogError
 from gradpath_api.application.validation import AnalysisValidationError
 from gradpath_api.domain.analysis import AnalysisRequest, AnalysisResponse
 from gradpath_api.infrastructure.ai.base import ModelProviderError
@@ -37,12 +39,16 @@ async def create_analysis(
 
     try:
         return await service.analyse(payload)
-    except RequirementExtractionError as exc:
+    except (RequirementExtractionError, SourceCatalogError) as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str(exc),
         ) from exc
-    except (AnalysisValidationError, ModelProviderError) as exc:
+    except (
+        AnalysisValidationError,
+        EvidenceRetrievalError,
+        ModelProviderError,
+    ) as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="The analysis provider did not return a safe result.",

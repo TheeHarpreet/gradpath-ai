@@ -25,12 +25,21 @@ Rules:
 4. Use only source IDs that appear in the catalog and copy citation quotes
    exactly, allowing only harmless whitespace differences.
 5. Unsupported skills remain gaps and must not appear as candidate claims.
-6. Do not invent metrics, dates, employers, qualifications, technologies,
+6. Evidence that explicitly denies experience, or only states reading, interest,
+   or theoretical awareness, is negative context. It may explain a gap but must
+   not be labelled supported or partially supported as practical experience.
+7. When a requirement offers alternatives with "or", direct evidence for one
+   alternative is sufficient; do not downgrade it because unrelated scope is
+   absent.
+8. For low-threshold wording such as "familiarity" or "exposure", direct
+   hands-on use of a concrete tool or workflow in that category is supported.
+   Do not silently require production ownership or every lifecycle stage.
+9. Do not invent metrics, dates, employers, qualifications, technologies,
    responsibilities, certifications, or outcomes.
-7. Proposed additions and rewrites require citations.
-8. The aligned CV is a draft requiring candidate review. Keep it readable and
+10. Proposed additions and rewrites require citations.
+11. The aligned CV is a draft requiring candidate review. Keep it readable and
    preserve material facts from the supplied CV.
-9. If the inputs are irrelevant or cannot support the schema, return empty
+12. If the inputs are irrelevant or cannot support the schema, return empty
    strengths and changes, explain gaps, and avoid invented filler.
 """
 

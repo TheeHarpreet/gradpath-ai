@@ -10,6 +10,11 @@ from gradpath_api.domain.source import SourceChunk
 _BLOCK_BREAK = re.compile(r"\n\s*\n")
 _MARKDOWN_HEADING = re.compile(r"^\s*#{1,6}\s+(?P<body>.+?)\s*$")
 _MARKDOWN_ANCHOR = re.compile(r"\s+\{#(?P<anchor>[a-z0-9-]+)\}\s*$")
+_MAX_SOURCE_CHUNKS = 100
+
+
+class SourceCatalogError(ValueError):
+    """Raised when candidate sources cannot form unambiguous citation units."""
 
 
 def build_source_catalog(request: AnalysisRequest) -> list[SourceChunk]:
@@ -28,6 +33,11 @@ def build_source_catalog(request: AnalysisRequest) -> list[SourceChunk]:
                 source_kind=SourceKind.SUPPORTING_EVIDENCE,
             )
         )
+    source_ids = [chunk.source_id for chunk in chunks]
+    if len(source_ids) > _MAX_SOURCE_CHUNKS:
+        raise SourceCatalogError("Candidate sources contain too many sections.")
+    if len(source_ids) != len(set(source_ids)):
+        raise SourceCatalogError("Candidate sources contain duplicate source IDs.")
     return chunks
 
 
