@@ -1,0 +1,54 @@
+{
+  "report_id": "step-4-rag-2026-07-30",
+  "case_ids": ["graduate-fullstack-001"],
+  "top_k": 3,
+  "evaluated_queries": 10,
+  "expected_evidence": 18,
+  "variants": [
+    {
+      "name": "step-3-lexical-baseline",
+      "storage": "memory",
+      "embedding_model": null,
+      "reranker": null,
+      "hit_rate_at_k": 0.6,
+      "recall_at_k": 0.4444,
+      "mean_reciprocal_rank": 0.6,
+      "retrieved_relevant_evidence": 8
+    },
+    {
+      "name": "postgres-hybrid-rrf",
+      "storage": "postgresql-pgvector",
+      "embedding_model": "text-embedding-3-small",
+      "reranker": null,
+      "hit_rate_at_k": 0.9,
+      "recall_at_k": 0.6667,
+      "mean_reciprocal_rank": 0.7333,
+      "retrieved_relevant_evidence": 12
+    },
+    {
+      "name": "postgres-hybrid-rrf-evidence-aware-v1",
+      "storage": "postgresql-pgvector",
+      "embedding_model": "text-embedding-3-small",
+      "reranker": "evidence-aware-v1",
+      "hit_rate_at_k": 1.0,
+      "recall_at_k": 0.8333,
+      "mean_reciprocal_rank": 0.8167,
+      "retrieved_relevant_evidence": 15,
+      "embedding_input_tokens": 568,
+      "estimated_embedding_cost_usd": 0.00001136
+    }
+  ],
+  "database_verification": {
+    "postgres_major": 18,
+    "pgvector_version": "0.8.5",
+    "exact_vector_search": true,
+    "generated_full_text_vector": true,
+    "remaining_rows_after_evaluation": 0
+  },
+  "limitations": [
+    "The report currently covers one deep fictional case and ten evaluated queries.",
+    "Expected evidence sets are manually reviewed and may not include every arguably relevant chunk.",
+    "Embedding-provider updates can change semantic ranks, so live results should be rerun before releases.",
+    "Retrieval relevance does not prove that evidence supports a candidate claim."
+  ]
+}

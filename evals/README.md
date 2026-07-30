@@ -12,3 +12,10 @@ The initial case is:
 - `graduate-fullstack-001`: a graduate software candidate with strong project
   evidence, limited commercial experience, partial Docker evidence, and no AWS
   or Kubernetes evidence.
+
+## Results
+
+- `results/step-4-rag-2026-07-30.json`: lexical, PostgreSQL hybrid, and
+  reranked retrieval metrics for the first golden case. The report contains
+  safe aggregate values and source IDs only—never CV text, vectors, prompts,
+  model output, or credentials.

@@ -35,6 +35,7 @@ indent-style = "space"
 [tool.pytest.ini_options]
 testpaths = ["apps/api/tests", "apps/mcp-server/tests"]
 addopts = ["-ra", "--strict-markers"]
+markers = ["postgres: requires the migrated PostgreSQL/pgvector service"]
 
 [tool.mypy]
 python_version = "3.13"

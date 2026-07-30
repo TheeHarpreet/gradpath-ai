@@ -12,7 +12,9 @@ WORKDIR /app
 RUN addgroup --system gradpath && adduser --system --ingroup gradpath gradpath
 
 COPY pyproject.toml uv.lock ./
+COPY alembic.ini alembic.ini
 COPY apps/api/pyproject.toml apps/api/pyproject.toml
+COPY apps/api/alembic apps/api/alembic
 COPY apps/api/src apps/api/src
 COPY apps/mcp-server/pyproject.toml apps/mcp-server/pyproject.toml
 COPY apps/mcp-server/src apps/mcp-server/src

@@ -16,6 +16,23 @@ jobs:
   python:
     name: Python quality
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg18
+        env:
+          POSTGRES_DB: gradpath
+          POSTGRES_USER: gradpath
+          POSTGRES_PASSWORD: gradpath_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U gradpath -d gradpath"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      GRADPATH_DATABASE_URL: postgresql+psycopg://gradpath:gradpath_dev@localhost:5432/gradpath
+      GRADPATH_RUN_POSTGRES_TESTS: "1"
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -39,6 +56,9 @@ jobs:
 
       - name: Type check
         run: python -m uv run mypy
+
+      - name: Apply database migrations
+        run: python -m uv run alembic upgrade head
 
       - name: Test
         run: python -m uv run pytest
@@ -74,4 +94,3 @@ jobs:
 
       - name: Build
         run: npm run build
-

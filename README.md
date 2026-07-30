@@ -5,10 +5,12 @@ early-career technology candidates.
 
 ## Status
 
-GradPath AI is currently implementing its evaluated text-analysis vertical
-slice. The API, deterministic requirement extraction, lexical retrieval,
-provider boundary, citation verification, and fictional golden-case tests are
-working locally. The user-facing analysis interface is not built yet.
+GradPath AI now has an evaluated text-analysis vertical slice and a measured RAG
+foundation. The API uses PostgreSQL full-text search, exact pgvector cosine
+retrieval, Reciprocal Rank Fusion, an explainable bounded reranker, structured
+model output, and independent citation verification. On the first fictional
+golden case, Hit Rate@3 improved from 0.60 to 1.00 and Recall@3 from 0.4444 to
+0.8333. The user-facing analysis interface is not built yet.
 
 The first usable milestone will accept a fictional or redacted CV and a job
 description, analyse the role's requirements against the candidate's evidence,
@@ -210,6 +212,8 @@ erDiagram
 - [Architecture decisions](docs/decisions/README.md)
 - [Evaluation strategy](docs/evaluation.md)
 - [Step 3 vertical slice](docs/step-3-vertical-slice.md)
+- [Step 4 RAG foundation](docs/step-4-rag-foundation.md)
+- [Step 4 retrieval results](evals/results/step-4-rag-2026-07-30.json)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
 
@@ -290,7 +294,14 @@ Add `OPENAI_API_KEY` only to the ignored `.env.local` file. API usage and
 ChatGPT/Codex subscriptions are billed separately. Automated tests use a
 deterministic provider and never require a key or network request.
 
-Run the current API and web foundations in separate terminals:
+Start PostgreSQL and apply the versioned database migration:
+
+```powershell
+docker compose up -d postgres
+python -m uv run alembic upgrade head
+```
+
+Run the API and web foundations in separate terminals:
 
 ```powershell
 python -m uv run gradpath-api

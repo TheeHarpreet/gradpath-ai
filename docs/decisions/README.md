@@ -19,4 +19,4 @@ from presenting technology choices as unexplained preferences.
 - [ADR-0004: Use PostgreSQL and pgvector](0004-postgresql-pgvector.md)
 - [ADR-0005: Keep MCP as a narrow adapter](0005-mcp-adapter.md)
 - [ADR-0006: Deploy the API to Cloud Run](0006-cloud-run.md)
-
+- [ADR-0007: Use measured hybrid retrieval with provider-neutral embeddings](0007-hybrid-rag.md)
