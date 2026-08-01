@@ -6,10 +6,10 @@ early-career technology candidates.
 ## Status
 
 GradPath AI now has an evaluated text-analysis vertical slice, measured hybrid
-RAG, and a resumable agentic workflow. LangGraph controls typed state, bounded
-retries, clarification, and human-review pauses; one tool-less OpenAI Agents SDK
-specialist returns structured analysis that application code independently
-verifies. The user-facing analysis interface is not built yet.
+RAG, a resumable agentic workflow, and a candidate-scoped MCP application
+tracker. LangGraph controls analysis state while an Agents SDK specialist can
+read and approval-gate fictional tracker updates through local stdio MCP. The
+user-facing analysis interface is not built yet.
 
 The first usable milestone will accept a fictional or redacted CV and a job
 description, analyse the role's requirements against the candidate's evidence,
@@ -215,6 +215,8 @@ erDiagram
 - [Step 5 agentic workflow](docs/step-5-agentic-workflow.md)
 - [Step 4 retrieval results](evals/results/step-4-rag-2026-07-30.json)
 - [Step 5 live workflow result](evals/results/step-5-agent-workflow-2026-08-01.json)
+- [Step 6 MCP integration](docs/step-6-mcp-integration.md)
+- [Step 6 MCP agent result](evals/results/step-6-mcp-agent-2026-08-01.json)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
 
@@ -238,6 +240,17 @@ flowchart LR
     MCPClient["MCP-compatible client"] --> MCP["Narrow MCP adapter"]
     MCP --> API
 ```
+
+## MCP application tracker
+
+Step 6 adds three narrow tools: list owned applications, inspect one owned
+application, and update one lifecycle stage. Writes require both a client-side
+approval interruption and a short-lived, single-use server token bound to the
+exact transition.
+
+![Step 6 MCP trust boundary](docs/images/step-6-mcp-trust-boundary.png)
+
+![Step 6 MCP approval sequence](docs/images/step-6-mcp-approval-sequence.png)
 
 The complete architecture document includes system context, container,
 component, agent-state, RAG-sequence, security-boundary, deployment, and

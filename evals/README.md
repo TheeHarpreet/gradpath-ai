@@ -21,3 +21,5 @@ The initial case is:
   model output, or credentials.
 - `results/step-5-agent-workflow-2026-08-01.json`: safe summary of the live
   synthetic LangGraph, hybrid retrieval, Agents SDK, and verification path.
+- `results/step-6-mcp-agent-2026-08-01.json`: safe summary of the live
+  synthetic Agents SDK read and approval-gated update through local MCP.

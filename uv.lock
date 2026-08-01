@@ -429,11 +429,15 @@ name = "gradpath-mcp"
 version = "0.1.0"
 source = { editable = "apps/mcp-server" }
 dependencies = [
+    { name = "gradpath-api" },
     { name = "mcp" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mcp", specifier = ">=1.28.1" }]
+requires-dist = [
+    { name = "gradpath-api", editable = "apps/api" },
+    { name = "mcp", specifier = ">=1.28.1" },
+]
 
 [[package]]
 name = "greenlet"
