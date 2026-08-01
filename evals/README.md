@@ -19,3 +19,5 @@ The initial case is:
   reranked retrieval metrics for the first golden case. The report contains
   safe aggregate values and source IDs only—never CV text, vectors, prompts,
   model output, or credentials.
+- `results/step-5-agent-workflow-2026-08-01.json`: safe summary of the live
+  synthetic LangGraph, hybrid retrieval, Agents SDK, and verification path.

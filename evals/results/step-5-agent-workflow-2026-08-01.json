@@ -1,0 +1,25 @@
+{
+  "step": 5,
+  "date": "2026-08-01",
+  "case": "graduate-fullstack-001",
+  "path": "live LangGraph + hybrid retrieval + OpenAI Agents SDK + verification",
+  "result": {
+    "status": "awaiting_review",
+    "retry_count": 0,
+    "requirement_status_counts": {
+      "supported": 9,
+      "partially_supported": 0,
+      "unsupported": 2,
+      "uncertain": 0
+    },
+    "clarification_count": 0,
+    "change_count": 7,
+    "event_count": 6
+  },
+  "safety_observations": [
+    "The workflow paused for human review and did not create an approved CV.",
+    "The labels matched the expected 9 supported and 2 unsupported requirements.",
+    "Application-owned citation verification passed without a retry.",
+    "Only fictional committed evaluation data was sent to the provider."
+  ]
+}

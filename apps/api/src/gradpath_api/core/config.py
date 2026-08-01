@@ -40,6 +40,10 @@ class Settings(BaseSettings):
         "max",
     ] = "medium"
     openai_store_responses: bool = False
+    agent_tracing_enabled: bool = False
+    agent_max_turns: int = Field(default=4, gt=0, le=10)
+    workflow_max_retries: int = Field(default=2, ge=0, le=5)
+    workflow_max_clarification_rounds: int = Field(default=1, ge=0, le=3)
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = Field(default=1536, gt=0, le=2000)
     embedding_batch_size: int = Field(default=32, gt=0, le=256)
