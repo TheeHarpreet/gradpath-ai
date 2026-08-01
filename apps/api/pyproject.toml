@@ -9,6 +9,7 @@ dependencies = [
     "langgraph>=1.2.9",
     "numpy>=2.4.3",
     "openai>=2.24.0",
+    "openai-agents>=0.8.1",
     "pgvector>=0.4.2",
     "psycopg[binary]>=3.3.4",
     "pydantic-settings>=2.14.2",

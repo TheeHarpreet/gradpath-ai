@@ -5,12 +5,11 @@ early-career technology candidates.
 
 ## Status
 
-GradPath AI now has an evaluated text-analysis vertical slice and a measured RAG
-foundation. The API uses PostgreSQL full-text search, exact pgvector cosine
-retrieval, Reciprocal Rank Fusion, an explainable bounded reranker, structured
-model output, and independent citation verification. On the first fictional
-golden case, Hit Rate@3 improved from 0.60 to 1.00 and Recall@3 from 0.4444 to
-0.8333. The user-facing analysis interface is not built yet.
+GradPath AI now has an evaluated text-analysis vertical slice, measured hybrid
+RAG, and a resumable agentic workflow. LangGraph controls typed state, bounded
+retries, clarification, and human-review pauses; one tool-less OpenAI Agents SDK
+specialist returns structured analysis that application code independently
+verifies. The user-facing analysis interface is not built yet.
 
 The first usable milestone will accept a fictional or redacted CV and a job
 description, analyse the role's requirements against the candidate's evidence,
@@ -213,7 +212,9 @@ erDiagram
 - [Evaluation strategy](docs/evaluation.md)
 - [Step 3 vertical slice](docs/step-3-vertical-slice.md)
 - [Step 4 RAG foundation](docs/step-4-rag-foundation.md)
+- [Step 5 agentic workflow](docs/step-5-agentic-workflow.md)
 - [Step 4 retrieval results](evals/results/step-4-rag-2026-07-30.json)
+- [Step 5 live workflow result](evals/results/step-5-agent-workflow-2026-08-01.json)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
 
@@ -229,7 +230,7 @@ in private object storage.
 flowchart LR
     Browser["Candidate browser"] --> Web["React + TypeScript + Vite"]
     Web -->|"REST + SSE"| API["FastAPI modular monolith"]
-    API --> Agent["LangGraph controlled workflow"]
+    API --> Agent["LangGraph controlled workflow<br/>OpenAI Agents SDK specialist"]
     Agent --> RAG["Hybrid RAG + claim verification"]
     RAG --> DB[("PostgreSQL + pgvector")]
     API --> Objects[("Private object storage")]
@@ -318,8 +319,16 @@ python -m uv run pytest
 npm --prefix apps/web run check
 ```
 
-The first endpoint is `POST /api/v1/analyses`. It accepts pasted CV, job
+The simplest endpoint is `POST /api/v1/analyses`. It accepts pasted CV, job
 description, and optional supporting-evidence text. Its response contains
 structured requirement assessments, exact candidate-evidence citations,
 strengths, gaps, change suggestions, unsupported-claim warnings, and a Markdown
 CV draft that is always marked as requiring review.
+
+The Step 5 lifecycle begins at `POST /api/v1/workflows`, can pause for
+clarification or review, and cannot return a completed CV until the candidate
+submits decisions for every change plus the exact Markdown they approve.
+
+![Step 5 agent interactions](docs/images/step-5-agent-interactions.png)
+
+![Step 5 resumable sequence](docs/images/step-5-agent-sequence.png)
