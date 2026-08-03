@@ -23,6 +23,10 @@ class WorkflowRepository(Protocol):
         """Persist a complete workflow snapshot."""
         ...
 
+    async def delete(self, workflow_id: str) -> None:
+        """Delete one workflow snapshot or raise WorkflowNotFoundError."""
+        ...
+
 
 class InMemoryWorkflowRepository:
     """Process-local development adapter; not suitable for production."""
@@ -38,3 +42,9 @@ class InMemoryWorkflowRepository:
 
     async def save(self, state: WorkflowState) -> None:
         self._states[state.workflow_id] = deepcopy(state)
+
+    async def delete(self, workflow_id: str) -> None:
+        try:
+            del self._states[workflow_id]
+        except KeyError as exc:
+            raise WorkflowNotFoundError(workflow_id) from exc

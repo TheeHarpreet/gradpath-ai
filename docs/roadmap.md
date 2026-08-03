@@ -59,6 +59,9 @@ created earlier.
 
 ## Stage 7 — User interface and product controls
 
+Status: implemented on the `codex/step-7-product-ui` branch with automated,
+document-render, desktop-browser, and mobile-browser verification.
+
 - Build the upload, analysis, requirement report, clarification, citation,
   accept/edit/reject, final-preview, export, and deletion experiences.
 - Add editable DOCX and viewable PDF export after the structured-text workflow

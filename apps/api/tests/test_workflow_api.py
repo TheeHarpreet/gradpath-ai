@@ -118,6 +118,16 @@ async def test_workflow_http_lifecycle_requires_explicit_review() -> None:
     assert completed.status_code == 200
     assert completed.json()["status"] == "completed"
 
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+        deleted = await client.delete(f"/api/v1/workflows/{snapshot['workflow_id']}")
+        missing = await client.get(f"/api/v1/workflows/{snapshot['workflow_id']}")
+
+    assert deleted.status_code == 204
+    assert missing.status_code == 404
+
 
 @pytest.mark.asyncio
 async def test_workflow_endpoint_is_unavailable_without_a_provider() -> None:

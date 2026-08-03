@@ -1,28 +1,48 @@
 import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import App from "./App";
 
 describe("App", () => {
-  it("labels the current product stage honestly", () => {
+  it("explains the evidence and approval boundaries", () => {
     render(<App />);
 
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: /tailor the evidence, never invent the person/i,
+        name: /turn your real experience into a role-ready cv/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      /document analysis is not available yet/i,
+    expect(screen.getByText(/no invented experience/i)).toBeInTheDocument();
+    expect(screen.getByText(/nothing is exported until/i)).toBeInTheDocument();
+  });
+
+  it("validates short evidence before calling the API", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(screen.getByLabelText(/your current cv/i), "Too short");
+    await user.type(
+      screen.getByLabelText(/job description/i),
+      "Also too short",
+    );
+    await user.click(
+      screen.getByRole("button", { name: /analyse my evidence/i }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      /at least 50 characters/i,
     );
   });
 
-  it("renders all planned review workflow stages", () => {
+  it("provides labelled file inputs for supported evidence", () => {
     render(<App />);
 
-    expect(screen.getAllByRole("listitem")).toHaveLength(8);
-    expect(screen.getByText("Review changes")).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/choose a file/i)).toHaveLength(3);
+    expect(
+      screen.getByRole("navigation", { name: /alignment progress/i }),
+    ).toBeInTheDocument();
   });
 });
