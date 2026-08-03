@@ -21,3 +21,4 @@ from presenting technology choices as unexplained preferences.
 - [ADR-0006: Deploy the API to Cloud Run](0006-cloud-run.md)
 - [ADR-0007: Use measured hybrid retrieval with provider-neutral embeddings](0007-hybrid-rag.md)
 - [ADR-0008: Use LangGraph with one bounded Agents SDK specialist](0008-langgraph-agents-sdk.md)
+- [ADR-0009: Candidate-scoped MCP with approval-gated writes](0009-approval-gated-mcp-tools.md)

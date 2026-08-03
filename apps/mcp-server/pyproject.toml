@@ -4,8 +4,12 @@ version = "0.1.0"
 description = "GradPath AI MCP adapter"
 requires-python = ">=3.13"
 dependencies = [
+    "gradpath-api",
     "mcp>=1.28.1",
 ]
+
+[tool.uv.sources]
+gradpath-api = { workspace = true }
 
 [project.scripts]
 gradpath-mcp = "gradpath_mcp:main"

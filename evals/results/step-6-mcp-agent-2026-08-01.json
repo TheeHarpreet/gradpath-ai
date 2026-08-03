@@ -1,0 +1,19 @@
+{
+  "step": 6,
+  "date": "2026-08-01",
+  "case": "fictional-application-tracker",
+  "path": "OpenAI Agents SDK + local stdio MCP + tracker service",
+  "result": {
+    "listed_count": 2,
+    "updated_application_id": "application-northstar-001",
+    "final_stage": "applied",
+    "approval_interruptions": 1,
+    "approval_token_recorded": false
+  },
+  "safety_observations": [
+    "Only records owned by profile-demo-001 were listed.",
+    "The MCP write paused for one explicit Agents SDK approval.",
+    "The server validated a single-use token bound to the exact transition.",
+    "All records and employers were fictional."
+  ]
+}
