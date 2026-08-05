@@ -73,6 +73,19 @@ async def get_workflow(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND) from exc
 
 
+@router.delete("/workflows/{workflow_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_workflow(
+    workflow_id: str,
+    service: WorkflowServiceDependency,
+) -> None:
+    """Permanently remove the active workflow snapshot."""
+
+    try:
+        await service.delete(workflow_id)
+    except WorkflowNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND) from exc
+
+
 @router.post(
     "/workflows/{workflow_id}/clarifications",
     response_model=WorkflowResponse,

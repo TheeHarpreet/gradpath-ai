@@ -73,6 +73,11 @@ class AlignmentWorkflowService:
     async def get(self, workflow_id: str) -> WorkflowResponse:
         return WorkflowResponse.from_state(await self._repository.get(workflow_id))
 
+    async def delete(self, workflow_id: str) -> None:
+        """Remove candidate-controlled workflow data from the active store."""
+
+        await self._repository.delete(workflow_id)
+
     async def clarify(
         self,
         workflow_id: str,

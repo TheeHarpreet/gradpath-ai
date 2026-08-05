@@ -6,10 +6,11 @@ early-career technology candidates.
 ## Status
 
 GradPath AI now has an evaluated text-analysis vertical slice, measured hybrid
-RAG, a resumable agentic workflow, and a candidate-scoped MCP application
-tracker. LangGraph controls analysis state while an Agents SDK specialist can
-read and approval-gate fictional tracker updates through local stdio MCP. The
-user-facing analysis interface is not built yet.
+RAG, a resumable agentic workflow, a candidate-scoped MCP application tracker,
+and a responsive user interface for the complete candidate-controlled flow.
+Users can paste or upload evidence, inspect cited requirement coverage, answer
+clarification questions, accept/edit/reject changes, approve the exact final
+CV, export DOCX/PDF/Markdown, and delete the active workflow.
 
 The first usable milestone will accept a fictional or redacted CV and a job
 description, analyse the role's requirements against the candidate's evidence,
@@ -217,6 +218,7 @@ erDiagram
 - [Step 5 live workflow result](evals/results/step-5-agent-workflow-2026-08-01.json)
 - [Step 6 MCP integration](docs/step-6-mcp-integration.md)
 - [Step 6 MCP agent result](evals/results/step-6-mcp-agent-2026-08-01.json)
+- [Step 7 product interface and export](docs/step-7-product-interface.md)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
 
@@ -341,6 +343,14 @@ CV draft that is always marked as requiring review.
 The Step 5 lifecycle begins at `POST /api/v1/workflows`, can pause for
 clarification or review, and cannot return a completed CV until the candidate
 submits decisions for every change plus the exact Markdown they approve.
+
+Step 7 exposes that lifecycle through the React application. TXT and Markdown
+files are read in the browser; DOCX and text-based PDF files are extracted in
+memory by `POST /api/v1/documents/extract`. Candidate-approved content can be
+exported through `/api/v1/documents/export/docx` and
+`/api/v1/documents/export/pdf`. `DELETE /api/v1/workflows/{workflow_id}` removes
+the active process-local snapshot. See the Step 7 document for current privacy
+limits and the path to production persistence.
 
 ![Step 5 agent interactions](docs/images/step-5-agent-interactions.png)
 
