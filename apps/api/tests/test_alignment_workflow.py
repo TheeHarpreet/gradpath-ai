@@ -9,6 +9,7 @@ from gradpath_api.application.alignment_workflow import (
     AlignmentWorkflowService,
     WorkflowConflictError,
 )
+from gradpath_api.application.input_security import UnsafeInputError
 from gradpath_api.application.retrievers import LexicalEvidenceRetriever
 from gradpath_api.application.workflow_repository import InMemoryWorkflowRepository
 from gradpath_api.domain.analysis import (
@@ -277,11 +278,10 @@ async def test_malicious_document_text_never_becomes_a_candidate_claim() -> None
     provider = SequenceProvider([lambda context: _analysis(context)])
     service = _service(provider)
 
-    result = await service.start(_request(malicious=True))
+    with pytest.raises(UnsafeInputError, match="Instruction-like content"):
+        await service.start(_request(malicious=True))
 
-    assert result.analysis is not None
-    assert "ten years" not in result.analysis.aligned_cv_markdown.casefold()
-    assert result.analysis.requirements[1].status is CoverageStatus.UNSUPPORTED
+    assert provider.calls == []
 
 
 @pytest.mark.asyncio

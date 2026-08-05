@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from langgraph.graph import END, START, StateGraph
 
+from gradpath_api.application.input_security import secure_analysis_request
 from gradpath_api.application.requirements import extract_requirements
 from gradpath_api.application.retrievers import EvidenceRetriever
 from gradpath_api.application.sources import build_source_catalog
@@ -61,12 +62,16 @@ class AlignmentWorkflowService:
         self._graph = self._build_graph()
 
     async def start(self, request: AnalysisRequest) -> WorkflowResponse:
+        request, redactions = secure_analysis_request(request)
         state = WorkflowState(
             workflow_id=f"workflow-{uuid4().hex}",
             request=request,
             max_retries=self._max_retries,
             events=["workflow_started"],
+            privacy_redactions=redactions.total,
         )
+        if redactions.total:
+            state.events.append("personal_data_redacted")
         result = await self._graph.ainvoke({"snapshot": state, "entrypoint": "start"})
         return await self._save_and_respond(result)
 
