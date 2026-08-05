@@ -27,6 +27,17 @@ async def test_readiness_endpoint() -> None:
 
 
 @pytest.mark.asyncio
+async def test_production_readiness_fails_without_provider() -> None:
+    app = create_app(Settings(_env_file=None, environment="production"))
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/health/ready")
+
+    assert response.status_code == 503
+    assert response.json() == {"status": "degraded"}
+
+
+@pytest.mark.asyncio
 async def test_meta_endpoint_exposes_no_secrets() -> None:
     transport = ASGITransport(app=create_app(Settings(environment="test")))
     async with AsyncClient(transport=transport, base_url="http://test") as client:

@@ -79,6 +79,51 @@ footer {
   font-size: 0.82rem;
   font-weight: 700;
 }
+.header-controls {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+.access-control {
+  position: relative;
+  font-size: 0.78rem;
+}
+.access-control summary {
+  color: #145946;
+  font-weight: 800;
+  cursor: pointer;
+}
+.access-control[open] {
+  position: absolute;
+  z-index: 10;
+  top: 4rem;
+  right: max(1rem, calc((100vw - 1180px) / 2));
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 1rem;
+  background: #fffefa;
+  border: 1px solid #9fb5a8;
+  border-radius: 0.65rem;
+  box-shadow: 0 12px 35px #19372b24;
+}
+.access-control label,
+.access-control small {
+  display: block;
+  margin-top: 0.65rem;
+}
+.access-control label {
+  font-weight: 800;
+}
+.access-control input {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.6rem;
+  border: 1px solid #899a91;
+  border-radius: 0.4rem;
+}
+.access-control small {
+  color: #5c6964;
+  line-height: 1.4;
+}
 .product-intro {
   display: grid;
   grid-template-columns: 1.5fr 0.65fr;
@@ -184,10 +229,19 @@ h2 {
   border-color: #145946;
 }
 .error-summary,
+.privacy-result,
 .working {
   margin: 1.5rem 0 0;
   padding: 1rem 1.2rem;
   border-radius: 0.55rem;
+}
+.privacy-result {
+  display: flex;
+  gap: 0.4rem;
+  flex-direction: column;
+  color: #184d3d;
+  background: #e3f0e7;
+  border: 1px solid #a7cbb5;
 }
 .error-summary {
   display: flex;
@@ -591,6 +645,10 @@ footer {
   }
 }
 @media (max-width: 580px) {
+  .header-controls {
+    align-items: end;
+    flex-direction: column;
+  }
   .privacy-note {
     max-width: 10rem;
     text-align: right;

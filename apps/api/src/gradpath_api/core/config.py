@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     environment: Literal["local", "test", "staging", "production"] = "local"
     enable_api_docs: bool = True
     cors_origins: list[AnyHttpUrl] = Field(default_factory=list)
+    demo_access_token: SecretStr | None = None
+    rate_limit_requests: int = Field(default=20, gt=0, le=1_000)
+    rate_limit_window_seconds: int = Field(default=60, gt=0, le=3_600)
+    trust_proxy_headers: bool = False
     database_url: PostgresDsn = PostgresDsn(
         "postgresql+psycopg://gradpath:gradpath_dev@localhost:5432/gradpath"
     )
@@ -31,6 +35,7 @@ class Settings(BaseSettings):
         validation_alias="OPENAI_API_KEY",
     )
     openai_model: str = "gpt-5.6-sol"
+    openai_fallback_model: str | None = None
     openai_reasoning_effort: Literal[
         "none",
         "low",

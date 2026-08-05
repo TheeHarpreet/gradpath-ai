@@ -11,6 +11,9 @@ and a responsive user interface for the complete candidate-controlled flow.
 Users can paste or upload evidence, inspect cited requirement coverage, answer
 clarification questions, accept/edit/reject changes, approve the exact final
 CV, export DOCX/PDF/Markdown, and delete the active workflow.
+Step 8 adds optional demo access control, rate limiting, direct-contact
+redaction, deterministic prompt-injection rejection, request-correlated safe
+logs, production-aware readiness, security headers, and provider fallback.
 
 The first usable milestone will accept a fictional or redacted CV and a job
 description, analyse the role's requirements against the candidate's evidence,
@@ -219,6 +222,7 @@ erDiagram
 - [Step 6 MCP integration](docs/step-6-mcp-integration.md)
 - [Step 6 MCP agent result](evals/results/step-6-mcp-agent-2026-08-01.json)
 - [Step 7 product interface and export](docs/step-7-product-interface.md)
+- [Step 8 security, privacy, and reliability](docs/step-8-security-privacy-reliability.md)
 - [Delivery roadmap](docs/roadmap.md)
 - [Glossary](docs/glossary.md)
 

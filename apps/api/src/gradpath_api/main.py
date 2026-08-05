@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from openai import AsyncOpenAI
 
 from gradpath_api.api.router import api_router
@@ -13,7 +15,9 @@ from gradpath_api.application.reranking import EvidenceAwareReranker
 from gradpath_api.application.retrievers import HybridEvidenceRetriever
 from gradpath_api.application.workflow_repository import InMemoryWorkflowRepository
 from gradpath_api.core.config import Settings, get_settings
+from gradpath_api.core.security import SecurityBoundaryMiddleware
 from gradpath_api.infrastructure.ai.agents_provider import AgentsSDKAnalysisProvider
+from gradpath_api.infrastructure.ai.fallback import FallbackAnalysisProvider
 from gradpath_api.infrastructure.embeddings.openai_provider import (
     OpenAIEmbeddingProvider,
 )
@@ -34,12 +38,36 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = resolved_settings
     app.state.analysis_service = _create_analysis_service(resolved_settings)
     app.state.workflow_service = _create_workflow_service(resolved_settings)
+    app.add_middleware(SecurityBoundaryMiddleware, settings=resolved_settings)
     app.include_router(api_router)
+
+    @app.exception_handler(RequestValidationError)
+    async def safe_validation_error(
+        request: Request,
+        exc: RequestValidationError,
+    ) -> JSONResponse:
+        """Report validation locations without echoing sensitive input values."""
+
+        del request
+        errors = [
+            {
+                "location": ".".join(str(part) for part in error["loc"]),
+                "message": error["msg"],
+                "type": error["type"],
+            }
+            for error in exc.errors()
+        ]
+        return JSONResponse(
+            status_code=422,
+            content={"detail": "Request validation failed.", "errors": errors},
+        )
 
     if resolved_settings.cors_origins:
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=[str(origin) for origin in resolved_settings.cors_origins],
+            allow_origins=[
+                str(origin).rstrip("/") for origin in resolved_settings.cors_origins
+            ],
             allow_credentials=True,
             allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
             allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
@@ -48,13 +76,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 
 
-def _create_analysis_service(settings: Settings) -> AnalysisService | None:
-    """Create the real provider only when a local or deployed secret exists."""
-
-    if settings.openai_api_key is None:
-        return None
-    client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value())
-    provider = AgentsSDKAnalysisProvider(
+def _create_provider(
+    settings: Settings,
+    client: AsyncOpenAI,
+) -> AgentsSDKAnalysisProvider | FallbackAnalysisProvider:
+    primary = AgentsSDKAnalysisProvider(
         client=client,
         model=settings.openai_model,
         reasoning_effort=settings.openai_reasoning_effort,
@@ -62,6 +88,26 @@ def _create_analysis_service(settings: Settings) -> AnalysisService | None:
         tracing_enabled=settings.agent_tracing_enabled,
         max_turns=settings.agent_max_turns,
     )
+    if settings.openai_fallback_model is None:
+        return primary
+    fallback = AgentsSDKAnalysisProvider(
+        client=client,
+        model=settings.openai_fallback_model,
+        reasoning_effort=settings.openai_reasoning_effort,
+        store=settings.openai_store_responses,
+        tracing_enabled=settings.agent_tracing_enabled,
+        max_turns=settings.agent_max_turns,
+    )
+    return FallbackAnalysisProvider([primary, fallback])
+
+
+def _create_analysis_service(settings: Settings) -> AnalysisService | None:
+    """Create the real provider only when a local or deployed secret exists."""
+
+    if settings.openai_api_key is None:
+        return None
+    client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value())
+    provider = _create_provider(settings, client)
     embedding_provider = OpenAIEmbeddingProvider(
         client=client,
         model=settings.embedding_model,
@@ -85,14 +131,7 @@ def _create_workflow_service(settings: Settings) -> AlignmentWorkflowService | N
     if settings.openai_api_key is None:
         return None
     client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value())
-    provider = AgentsSDKAnalysisProvider(
-        client=client,
-        model=settings.openai_model,
-        reasoning_effort=settings.openai_reasoning_effort,
-        store=settings.openai_store_responses,
-        tracing_enabled=settings.agent_tracing_enabled,
-        max_turns=settings.agent_max_turns,
-    )
+    provider = _create_provider(settings, client)
     embedding_provider = OpenAIEmbeddingProvider(
         client=client,
         model=settings.embedding_model,
