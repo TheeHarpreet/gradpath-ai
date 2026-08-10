@@ -27,7 +27,7 @@ jobs:
       WEB_SERVICE: gradpath-web-staging
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Validate deployment variables
         shell: bash
