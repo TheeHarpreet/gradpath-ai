@@ -1,0 +1,141 @@
+name: Deploy staging to Cloud Run
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: gradpath-staging-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, deploy, and smoke-test
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_ARTIFACT_REPOSITORY: ${{ vars.GCP_ARTIFACT_REPOSITORY }}
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+      GCP_DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      GCP_RUNTIME_SERVICE_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+      API_SERVICE: gradpath-api-staging
+      WEB_SERVICE: gradpath-web-staging
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate deployment variables
+        shell: bash
+        run: |
+          missing=0
+          for name in GCP_PROJECT_ID GCP_REGION GCP_ARTIFACT_REPOSITORY GCP_WORKLOAD_IDENTITY_PROVIDER GCP_DEPLOY_SERVICE_ACCOUNT GCP_RUNTIME_SERVICE_ACCOUNT; do
+            if [[ -z "${!name}" ]]; then echo "Missing GitHub environment variable: ${name}"; missing=1; fi
+          done
+          exit "$missing"
+
+      - name: Authenticate to Google Cloud without a stored key
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Configure Artifact Registry authentication
+        run: gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+
+      - name: Build and push API image
+        shell: bash
+        run: |
+          API_IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_ARTIFACT_REPOSITORY}/api:${GITHUB_SHA}"
+          docker build --file apps/api/Dockerfile --tag "$API_IMAGE" .
+          docker push "$API_IMAGE"
+          echo "API_IMAGE=$API_IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy API revision
+        run: >-
+          gcloud run deploy "${API_SERVICE}"
+          --image "${API_IMAGE}"
+          --project "${GCP_PROJECT_ID}"
+          --region "${GCP_REGION}"
+          --platform managed
+          --service-account "${GCP_RUNTIME_SERVICE_ACCOUNT}"
+          --allow-unauthenticated
+          --port 8080
+          --cpu 1
+          --memory 1Gi
+          --concurrency 10
+          --min-instances 0
+          --max-instances 1
+          --timeout 300
+          --set-env-vars "GRADPATH_ENVIRONMENT=staging,GRADPATH_ENABLE_API_DOCS=false,GRADPATH_RETRIEVAL_BACKEND=lexical,GRADPATH_AGENT_TRACING_ENABLED=false"
+          --set-secrets "OPENAI_API_KEY=gradpath-openai-api-key:latest,GRADPATH_DEMO_ACCESS_TOKEN=gradpath-demo-access-token:latest"
+          --quiet
+
+      - name: Discover API URL
+        shell: bash
+        run: |
+          API_URL="$(gcloud run services describe "${API_SERVICE}" --project "${GCP_PROJECT_ID}" --region "${GCP_REGION}" --format='value(status.url)')"
+          test -n "$API_URL"
+          echo "API_URL=$API_URL" >> "$GITHUB_ENV"
+
+      - name: Build and push web image
+        shell: bash
+        run: |
+          WEB_IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_ARTIFACT_REPOSITORY}/web:${GITHUB_SHA}"
+          docker build --file apps/web/Dockerfile --build-arg "VITE_API_BASE_URL=${API_URL}/api/v1" --tag "$WEB_IMAGE" .
+          docker push "$WEB_IMAGE"
+          echo "WEB_IMAGE=$WEB_IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy web revision
+        run: >-
+          gcloud run deploy "${WEB_SERVICE}"
+          --image "${WEB_IMAGE}"
+          --project "${GCP_PROJECT_ID}"
+          --region "${GCP_REGION}"
+          --platform managed
+          --allow-unauthenticated
+          --port 8080
+          --cpu 1
+          --memory 256Mi
+          --concurrency 40
+          --min-instances 0
+          --max-instances 1
+          --timeout 30
+          --quiet
+
+      - name: Discover web URL and restrict API CORS
+        shell: bash
+        run: |
+          WEB_URL="$(gcloud run services describe "${WEB_SERVICE}" --project "${GCP_PROJECT_ID}" --region "${GCP_REGION}" --format='value(status.url)')"
+          test -n "$WEB_URL"
+          echo "WEB_URL=$WEB_URL" >> "$GITHUB_ENV"
+          gcloud run services update "${API_SERVICE}" \
+            --project "${GCP_PROJECT_ID}" \
+            --region "${GCP_REGION}" \
+            --update-env-vars "^@^GRADPATH_CORS_ORIGINS=[\"${WEB_URL}\"]" \
+            --quiet
+
+      - name: Smoke-test deployed services
+        shell: bash
+        run: |
+          curl --fail --silent --show-error "${API_URL}/health/live"
+          curl --fail --silent --show-error "${API_URL}/health/ready"
+          curl --fail --silent --show-error "${WEB_URL}/health"
+
+      - name: Write deployment summary
+        shell: bash
+        run: |
+          {
+            echo "## GradPath AI staging deployment"
+            echo "- Web: ${WEB_URL}"
+            echo "- API: ${API_URL}"
+            echo "- Image tag: ${GITHUB_SHA}"
+            echo "- Roll back: run \`gcloud run revisions list --service SERVICE --region ${GCP_REGION}\`, then \`gcloud run services update-traffic SERVICE --to-revisions REVISION=100 --region ${GCP_REGION}\`."
+          } >> "$GITHUB_STEP_SUMMARY"

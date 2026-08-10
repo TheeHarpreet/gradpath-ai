@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = Field(default=1536, gt=0, le=2000)
     embedding_batch_size: int = Field(default=32, gt=0, le=256)
+    retrieval_backend: Literal["hybrid", "lexical"] = "hybrid"
     retrieval_limit: int = Field(default=3, gt=0, le=20)
     retrieval_candidate_limit: int = Field(default=8, gt=0, le=100)
     retrieval_rrf_k: int = Field(default=60, gt=0, le=1000)

@@ -12,7 +12,11 @@ from gradpath_api.api.router import api_router
 from gradpath_api.application.alignment_workflow import AlignmentWorkflowService
 from gradpath_api.application.analysis_service import AnalysisService
 from gradpath_api.application.reranking import EvidenceAwareReranker
-from gradpath_api.application.retrievers import HybridEvidenceRetriever
+from gradpath_api.application.retrievers import (
+    EvidenceRetriever,
+    HybridEvidenceRetriever,
+    LexicalEvidenceRetriever,
+)
 from gradpath_api.application.workflow_repository import InMemoryWorkflowRepository
 from gradpath_api.core.config import Settings, get_settings
 from gradpath_api.core.security import SecurityBoundaryMiddleware
@@ -108,6 +112,15 @@ def _create_analysis_service(settings: Settings) -> AnalysisService | None:
         return None
     client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value())
     provider = _create_provider(settings, client)
+    retriever = _create_retriever(settings, client)
+    return AnalysisService(provider, retriever=retriever)
+
+
+def _create_retriever(settings: Settings, client: AsyncOpenAI) -> EvidenceRetriever:
+    """Select the documented retrieval backend for this environment."""
+
+    if settings.retrieval_backend == "lexical":
+        return LexicalEvidenceRetriever(limit_per_requirement=settings.retrieval_limit)
     embedding_provider = OpenAIEmbeddingProvider(
         client=client,
         model=settings.embedding_model,
@@ -122,7 +135,7 @@ def _create_analysis_service(settings: Settings) -> AnalysisService | None:
         index=PostgresRetrievalIndex(str(settings.database_url)),
         reranker=EvidenceAwareReranker(),
     )
-    return AnalysisService(provider, retriever=retriever)
+    return retriever
 
 
 def _create_workflow_service(settings: Settings) -> AlignmentWorkflowService | None:
@@ -132,20 +145,7 @@ def _create_workflow_service(settings: Settings) -> AlignmentWorkflowService | N
         return None
     client = AsyncOpenAI(api_key=settings.openai_api_key.get_secret_value())
     provider = _create_provider(settings, client)
-    embedding_provider = OpenAIEmbeddingProvider(
-        client=client,
-        model=settings.embedding_model,
-        dimensions=settings.embedding_dimensions,
-        batch_size=settings.embedding_batch_size,
-    )
-    retriever = HybridEvidenceRetriever(
-        embedding_provider=embedding_provider,
-        limit_per_requirement=settings.retrieval_limit,
-        candidate_limit=settings.retrieval_candidate_limit,
-        rrf_k=settings.retrieval_rrf_k,
-        index=PostgresRetrievalIndex(str(settings.database_url)),
-        reranker=EvidenceAwareReranker(),
-    )
+    retriever = _create_retriever(settings, client)
     return AlignmentWorkflowService(
         provider=provider,
         retriever=retriever,

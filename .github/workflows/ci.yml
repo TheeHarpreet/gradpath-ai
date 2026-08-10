@@ -94,3 +94,40 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  containers:
+    name: Production containers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build images
+        run: |
+          docker build --file apps/api/Dockerfile --tag gradpath-api:ci .
+          docker build --file apps/web/Dockerfile --tag gradpath-web:ci .
+
+      - name: Smoke-test API image
+        run: |
+          docker run --detach --name gradpath-api --publish 18080:8080 gradpath-api:ci
+          for attempt in {1..30}; do
+            curl --fail --silent http://127.0.0.1:18080/health/live && exit 0
+            sleep 1
+          done
+          docker logs gradpath-api
+          exit 1
+
+      - name: Smoke-test web image
+        run: |
+          docker run --detach --name gradpath-web --publish 18081:8080 gradpath-web:ci
+          for attempt in {1..30}; do
+            curl --fail --silent http://127.0.0.1:18081/health && exit 0
+            sleep 1
+          done
+          docker logs gradpath-web
+          exit 1
+
+      - name: Scan images for critical vulnerabilities
+        run: |
+          docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.66.0 image --exit-code 1 --ignore-unfixed --severity CRITICAL gradpath-api:ci
+          docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.66.0 image --exit-code 1 --ignore-unfixed --severity CRITICAL gradpath-web:ci
