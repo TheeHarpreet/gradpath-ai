@@ -1,5 +1,8 @@
 FROM python:3.13-slim AS runtime
 
+LABEL org.opencontainers.image.title="GradPath AI API" \
+      org.opencontainers.image.description="Evidence-grounded CV and job-description analysis API"
+
 COPY --from=ghcr.io/astral-sh/uv:0.11.32 /uv /uvx /bin/
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -24,5 +27,8 @@ RUN uv sync --locked --no-dev --package gradpath-api
 USER gradpath
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["/app/.venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health/live', timeout=3)"]
 
 CMD ["/app/.venv/bin/uvicorn", "gradpath_api.main:app", "--host", "0.0.0.0", "--port", "8080"]

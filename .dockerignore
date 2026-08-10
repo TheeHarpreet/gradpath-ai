@@ -10,4 +10,4 @@
 .env
 uploads
 data/private
-
+gha-creds-*.json
