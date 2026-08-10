@@ -11,6 +11,7 @@ import {
   startWorkflow,
   submitClarifications,
   submitReview,
+  setDemoAccessToken,
 } from "./api";
 
 type InputName = "candidate_cv" | "job_description" | "supporting_evidence";
@@ -39,6 +40,7 @@ function App() {
   const [approvedCv, setApprovedCv] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [demoToken, setDemoToken] = useState("");
 
   const stage =
     workflow?.status === "completed"
@@ -186,9 +188,26 @@ function App() {
           </span>
           <span>GradPath AI</span>
         </a>
-        <span className="privacy-note">
-          Private by design · You approve every change
-        </span>
+        <div className="header-controls">
+          <span className="privacy-note">
+            Private by design · You approve every change
+          </span>
+          <details className="access-control">
+            <summary>Demo access</summary>
+            <label htmlFor="demo-token">Access token</label>
+            <input
+              id="demo-token"
+              type="password"
+              value={demoToken}
+              autoComplete="off"
+              onChange={(event) => {
+                setDemoToken(event.target.value);
+                setDemoAccessToken(event.target.value);
+              }}
+            />
+            <small>Kept in memory only; never saved by this page.</small>
+          </details>
+        </div>
       </header>
 
       <main id="main-content">
@@ -236,6 +255,18 @@ function App() {
           <p className="working" role="status">
             Working securely… this can take a moment.
           </p>
+        )}
+
+        {workflow && workflow.privacy_redactions > 0 && (
+          <div className="privacy-result" role="status">
+            <strong>Privacy protection applied.</strong>
+            <span>
+              {workflow.privacy_redactions} direct contact identifier
+              {workflow.privacy_redactions === 1 ? " was" : "s were"} replaced
+              before AI processing. Add verified contact details back during
+              final review if needed.
+            </span>
+          </div>
         )}
 
         {!workflow && (
@@ -379,8 +410,9 @@ function EvidenceForm({
         <p className="eyebrow">Step 1 of 4</p>
         <h2 id="evidence-title">Bring the evidence</h2>
         <p>
-          Remove your address, phone number, and references before using an AI
-          service. Files are converted to text in memory.
+          Email addresses, phone numbers, and UK postcodes are replaced before
+          AI processing. Still remove references and unnecessary sensitive
+          details. Files are converted to text in memory.
         </p>
       </div>
       <form className="evidence-form" onSubmit={onSubmit}>

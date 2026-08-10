@@ -8,6 +8,7 @@ from gradpath_api.application.alignment_workflow import (
     AlignmentWorkflowService,
     WorkflowConflictError,
 )
+from gradpath_api.application.input_security import UnsafeInputError
 from gradpath_api.application.requirements import RequirementExtractionError
 from gradpath_api.application.retrievers import EvidenceRetrievalError
 from gradpath_api.application.sources import SourceCatalogError
@@ -48,7 +49,7 @@ async def start_workflow(
 
     try:
         return await service.start(payload)
-    except (RequirementExtractionError, SourceCatalogError) as exc:
+    except (RequirementExtractionError, SourceCatalogError, UnsafeInputError) as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str(exc),

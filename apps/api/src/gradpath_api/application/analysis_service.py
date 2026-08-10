@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from uuid import uuid4
 
+from gradpath_api.application.input_security import secure_analysis_request
 from gradpath_api.application.requirements import extract_requirements
 from gradpath_api.application.retrievers import (
     EvidenceRetriever,
@@ -31,6 +32,7 @@ class AnalysisService:
     async def analyse(self, request: AnalysisRequest) -> AnalysisResponse:
         """Run one analysis without persisting sensitive candidate text."""
 
+        request, _ = secure_analysis_request(request)
         requirements = extract_requirements(request.job_description)
         catalog = build_source_catalog(request)
         retrieved_evidence = await self._retriever.retrieve(requirements, catalog)

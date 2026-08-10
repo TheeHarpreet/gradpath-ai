@@ -94,6 +94,7 @@ class WorkflowState(ContractModel):
     retry_count: int = Field(default=0, ge=0)
     max_retries: int = Field(default=2, ge=0, le=5)
     failure_code: str | None = None
+    privacy_redactions: int = Field(default=0, ge=0)
     review_decisions: list[ChangeReview] = Field(default_factory=list)
     approved_cv_markdown: str | None = Field(default=None, max_length=100_000)
     events: list[str] = Field(default_factory=list)
@@ -110,6 +111,7 @@ class WorkflowResponse(ContractModel):
     review_decisions: list[ChangeReview]
     approved_cv_markdown: str | None
     events: list[str]
+    privacy_redactions: int
 
     @classmethod
     def from_state(cls, state: WorkflowState) -> WorkflowResponse:
@@ -124,6 +126,7 @@ class WorkflowResponse(ContractModel):
             review_decisions=state.review_decisions,
             approved_cv_markdown=state.approved_cv_markdown,
             events=state.events,
+            privacy_redactions=state.privacy_redactions,
         )
 
 

@@ -72,6 +72,9 @@ document-render, desktop-browser, and mobile-browser verification.
 
 ## Stage 8 — Security, privacy, and reliability
 
+Status: implemented on the `codex/step-8-security-reliability` branch with
+abuse-case, privacy, access-control, throttling, fallback, and readiness tests.
+
 - Add prompt-injection defences, file limits, redaction, authentication or a
   safe public-demo mode, rate limiting, structured logs, health checks, and
   provider fallbacks.

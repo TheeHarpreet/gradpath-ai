@@ -48,20 +48,37 @@ export interface WorkflowResponse {
     aligned_cv_markdown: string;
   } | null;
   approved_cv_markdown: string | null;
+  privacy_redactions: number;
 }
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1";
+let demoAccessToken = "";
+
+export function setDemoAccessToken(token: string) {
+  demoAccessToken = token.trim();
+}
+
+function secureHeaders(headers?: HeadersInit): Headers {
+  const result = new Headers(headers);
+  if (demoAccessToken) result.set("Authorization", `Bearer ${demoAccessToken}`);
+  result.set("X-Request-ID", `web-${crypto.randomUUID()}`);
+  return result;
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, options);
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: secureHeaders(options?.headers),
+  });
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as {
       detail?: string;
     } | null;
-    throw new Error(
-      body?.detail ?? "GradPath AI could not complete the request.",
-    );
+    const requestId = response.headers.get("X-Request-ID");
+    const message =
+      body?.detail ?? "GradPath AI could not complete the request.";
+    throw new Error(requestId ? `${message} Reference: ${requestId}` : message);
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
@@ -85,7 +102,7 @@ export function startWorkflow(payload: {
 }) {
   return request<WorkflowResponse>("/workflows", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: secureHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
 }
@@ -130,14 +147,18 @@ export async function downloadExport(
 ) {
   const response = await fetch(`${API_BASE}/documents/export/${format}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: secureHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
       approved_cv_markdown: approvedCvMarkdown,
       filename: "gradpath-aligned-cv",
     }),
   });
-  if (!response.ok)
-    throw new Error(`The ${format.toUpperCase()} export failed.`);
+  if (!response.ok) {
+    const requestId = response.headers.get("X-Request-ID");
+    throw new Error(
+      `The ${format.toUpperCase()} export failed.${requestId ? ` Reference: ${requestId}` : ""}`,
+    );
+  }
   const url = URL.createObjectURL(await response.blob());
   const anchor = document.createElement("a");
   anchor.href = url;
