@@ -100,6 +100,7 @@ jobs:
           --project "${GCP_PROJECT_ID}"
           --region "${GCP_REGION}"
           --platform managed
+          --service-account "${GCP_RUNTIME_SERVICE_ACCOUNT}"
           --allow-unauthenticated
           --port 8080
           --cpu 1
